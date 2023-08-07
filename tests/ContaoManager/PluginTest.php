@@ -17,11 +17,11 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
 use Contao\TestCase\ContaoTestCase;
-use Respinar\ContaoSimpleBlog\ContaoManager\Plugin;
-use Respinar\ContaoSimpleBlog\RespinarContaoSimpleBlog;
+use Respinar\SimpleBlogBundle\ContaoManager\Plugin;
+use Respinar\SimpleBlogBundle\RespinarSimpleBlogBundle;
 
 /**
- * @package Respinar\ContaoSimpleBlog\Tests\ContaoManager
+ * @package Respinar\SimpleBlogBundle\Tests\ContaoManager
  */
 class PluginTest extends ContaoTestCase
 {
@@ -45,7 +45,7 @@ class PluginTest extends ContaoTestCase
 
         $this->assertCount(1, $bundles);
         $this->assertInstanceOf(BundleConfig::class, $bundles[0]);
-        $this->assertSame(RespinarContaoSimpleBlog::class, $bundles[0]->getName());
+        $this->assertSame(RespinarSimpleBlogBundle::class, $bundles[0]->getName());
         $this->assertSame([ContaoCoreBundle::class], $bundles[0]->getLoadAfter());
     }
 

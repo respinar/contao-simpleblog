@@ -16,7 +16,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\CoreBundle\ContaoCoreBundle;
-use Respinar\ContaoSimpleBlog\RespinarSimpleBlogBundle;
+use Respinar\SimpleBlogBundle\RespinarSimpleBlogBundle;
 
 class Plugin implements BundlePluginInterface
 {

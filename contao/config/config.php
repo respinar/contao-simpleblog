@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-use Respinar\ContaoSimpleBlog\Model\BlogModel;
+use Respinar\SimpleBlogBundle\Model\BlogModel;
 
 /**
  * Backend modules

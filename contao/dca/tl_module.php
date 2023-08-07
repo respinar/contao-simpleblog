@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license MIT
  */
 
-use Respinar\ContaoSimpleBlog\Controller\FrontendModule\BlogListController;
+use Respinar\SimpleBlogBundle\Controller\FrontendModule\BlogListController;
 
 /**
  * Frontend modules
