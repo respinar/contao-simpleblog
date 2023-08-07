@@ -10,14 +10,14 @@ declare(strict_types=1);
  * @license MIT
  */
 
-namespace Respinar\ContaoSimpleBlog\DependencyInjection;
+namespace Respinar\SimpleBlogBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class RespinarContaoSimpleBlogExtension extends Extension
+class RespinarSimpleBlogExtension extends Extension
 {
     /**
      * @throws \Exception
@@ -30,8 +30,6 @@ class RespinarContaoSimpleBlogExtension extends Extension
             new FileLocator(__DIR__.'/../../config')
         );
 
-        $loader->load('parameters.yaml');
         $loader->load('services.yaml');
-        $loader->load('listener.yaml');
     }
 }
