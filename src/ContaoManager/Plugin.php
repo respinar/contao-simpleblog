@@ -10,19 +10,21 @@ declare(strict_types=1);
  * @license MIT
  */
 
-namespace Respinar\ContaoSimpleBlog\ContaoManager;
+namespace Respinar\SimpleBlogBundle\ContaoManager;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use Contao\CoreBundle\ContaoCoreBundle;
+use Respinar\ContaoSimpleBlog\RespinarSimpleBlogBundle;
 
 class Plugin implements BundlePluginInterface
 {
     public function getBundles(ParserInterface $parser): array
     {
         return [
-            BundleConfig::create('Respinar\ContaoSimpleBlog\RespinarContaoSimpleBlog')
-                ->setLoadAfter(['Contao\CoreBundle\ContaoCoreBundle']),
+            BundleConfig::create(RespinarSimpleBlogBundle::class)
+                ->setLoadAfter([ContaoCoreBundle::class]),
         ];
     }
 }
