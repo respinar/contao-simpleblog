@@ -10,12 +10,12 @@ declare(strict_types=1);
  * @license MIT
  */
 
-namespace Respinar\ContaoSimpleBlog;
+namespace Respinar\SimpleBlogBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class RespinarContaoSimpleBlog extends Bundle
+class RespinarSimpleBlogBundle extends Bundle
 {
     public function getPath(): string
     {
