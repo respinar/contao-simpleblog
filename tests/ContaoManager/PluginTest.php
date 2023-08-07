@@ -11,7 +11,7 @@
  */
 declare(strict_types=1);
 
-namespace Respinar\ContaoSimpleBlog\Tests\ContaoManager;
+namespace Respinar\SimpleBlogBundle\Tests\ContaoManager;
 
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
