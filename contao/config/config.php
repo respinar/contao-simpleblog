@@ -8,16 +8,26 @@
  * @license MIT
  */
 
-use Respinar\SimpleBlogBundle\Model\BlogModel;
+use Respinar\SimpleBlogBundle\Model\BlogArchiveModel;
+use Respinar\SimpleBlogBundle\Model\BlogPostModel;
 
-/**
- * Backend modules
- */
-$GLOBALS['BE_MOD']['content']['blog_post'] = array(
-    'tables' => array('tl_blog')
+// Back end modules
+$GLOBALS['BE_MOD']['content']['blog'] = array
+(
+	'tables'      => array('tl_blog_archive', 'tl_blog_post', 'tl_content'),
+	// 'table'       => array(BackendCsvImportController::class, 'importTableWizardAction'),
+	// 'list'        => array(BackendCsvImportController::class, 'importListWizardAction')
 );
 
-/**
- * Models
- */
-$GLOBALS['TL_MODELS']['tl_blog'] = BlogModel::class;
+// Front end modules
+$GLOBALS['FE_MOD']['blog'] = array
+(
+	// 'newslist'    => ModuleNewsList::class,
+	// 'newsreader'  => ModuleNewsReader::class,
+	// 'newsarchive' => ModuleNewsArchive::class,
+	// 'newsmenu'    => ModuleNewsMenu::class
+);
+
+// Models
+$GLOBALS['TL_MODELS']['tl_blog_archive'] = BlogArchiveModel::class;
+$GLOBALS['TL_MODELS']['tl_blog_post'] = BlogPostModel::class;
