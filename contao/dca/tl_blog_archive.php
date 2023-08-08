@@ -16,8 +16,8 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\Image;
 use Contao\Input;
-//use Contao\News;
-//use Contao\NewsBundle\Security\ContaoNewsPermissions;
+use Respinar\SimpleBlogBundle\Blog;
+use Respinar\SimpleBlogBundle\Security\BlogPermissions;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_blog_archive'] = array
 		(
 			'feeds' => array
 			(
-				'href'                => 'table=tl_news_feed',
+				'href'                => 'table=tl_blog_feed',
 				'class'               => 'header_rss',
 				'attributes'          => 'onclick="Backend.getScrollOffset()"',
 				'button_callback'     => array('tl_blog_archive', 'manageFeeds')
@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_blog_archive'] = array
 		(
 			'edit' => array
 			(
-				'href'                => 'table=tl_news',
+				'href'                => 'table=tl_blog_post',
 				'icon'                => 'edit.svg'
 			),
 			'editheader' => array
@@ -254,7 +254,7 @@ $GLOBALS['TL_DCA']['tl_blog_archive'] = array
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property News $News
+ * @property Blog $Blog
  */
 class tl_blog_archive extends Backend
 {
@@ -288,20 +288,20 @@ class tl_blog_archive extends Backend
 		}
 
 		// Set root IDs
-		if (empty($this->User->news) || !is_array($this->User->news))
+		if (empty($this->User->blog) || !is_array($this->User->blog))
 		{
 			$root = array(0);
 		}
 		else
 		{
-			$root = $this->User->news;
+			$root = $this->User->blog;
 		}
 
 		$GLOBALS['TL_DCA']['tl_blog_archive']['list']['sorting']['root'] = $root;
 		$security = System::getContainer()->get('security.helper');
 
 		// Check permissions to add archives
-		if (!$security->isGranted(ContaoNewsPermissions::USER_CAN_CREATE_ARCHIVES))
+		if (!$security->isGranted(BlogPermissions::USER_CAN_CREATE_ARCHIVES))
 		{
 			$GLOBALS['TL_DCA']['tl_blog_archive']['config']['closed'] = true;
 			$GLOBALS['TL_DCA']['tl_blog_archive']['config']['notCreatable'] = true;
@@ -309,7 +309,7 @@ class tl_blog_archive extends Backend
 		}
 
 		// Check permissions to delete calendars
-		if (!$security->isGranted(ContaoNewsPermissions::USER_CAN_DELETE_ARCHIVES))
+		if (!$security->isGranted(BlogPermissions::USER_CAN_DELETE_ARCHIVES))
 		{
 			$GLOBALS['TL_DCA']['tl_blog_archive']['config']['notDeletable'] = true;
 		}
@@ -324,9 +324,9 @@ class tl_blog_archive extends Backend
 				break;
 
 			case 'create':
-				if (!$security->isGranted(ContaoNewsPermissions::USER_CAN_CREATE_ARCHIVES))
+				if (!$security->isGranted(BlogPermissions::USER_CAN_CREATE_ARCHIVES))
 				{
-					throw new AccessDeniedException('Not enough permissions to create news archives.');
+					throw new AccessDeniedException('Not enough permissions to create blog archives.');
 				}
 				break;
 
@@ -334,9 +334,9 @@ class tl_blog_archive extends Backend
 			case 'copy':
 			case 'delete':
 			case 'show':
-				if (!in_array(Input::get('id'), $root) || (Input::get('act') == 'delete' && !$security->isGranted(ContaoNewsPermissions::USER_CAN_DELETE_ARCHIVES)))
+				if (!in_array(Input::get('id'), $root) || (Input::get('act') == 'delete' && !$security->isGranted(BlogPermissions::USER_CAN_DELETE_ARCHIVES)))
 				{
-					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' news archive ID ' . Input::get('id') . '.');
+					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' blog archive ID ' . Input::get('id') . '.');
 				}
 				break;
 
@@ -346,7 +346,7 @@ class tl_blog_archive extends Backend
 			case 'copyAll':
 				$session = $objSession->all();
 
-				if (Input::get('act') == 'deleteAll' && !$security->isGranted(ContaoNewsPermissions::USER_CAN_DELETE_ARCHIVES))
+				if (Input::get('act') == 'deleteAll' && !$security->isGranted(BlogPermissions::USER_CAN_DELETE_ARCHIVES))
 				{
 					$session['CURRENT']['IDS'] = array();
 				}
@@ -360,7 +360,7 @@ class tl_blog_archive extends Backend
 			default:
 				if (Input::get('act'))
 				{
-					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' news archives.');
+					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' blog archives.');
 				}
 				break;
 		}
@@ -385,13 +385,13 @@ class tl_blog_archive extends Backend
 		}
 
 		// Set root IDs
-		if (empty($this->User->news) || !is_array($this->User->news))
+		if (empty($this->User->blog) || !is_array($this->User->blog))
 		{
 			$root = array(0);
 		}
 		else
 		{
-			$root = $this->User->news;
+			$root = $this->User->blog;
 		}
 
 		// The archive is enabled already
@@ -410,19 +410,19 @@ class tl_blog_archive extends Backend
 			// Add the permissions on group level
 			if ($this->User->inherit != 'custom')
 			{
-				$objGroup = $this->Database->execute("SELECT id, news, newp FROM tl_user_group WHERE id IN(" . implode(',', array_map('\intval', $this->User->groups)) . ")");
+				$objGroup = $this->Database->execute("SELECT id, blogs, blogp FROM tl_user_group WHERE id IN(" . implode(',', array_map('\intval', $this->User->groups)) . ")");
 
 				while ($objGroup->next())
 				{
-					$arrNewp = StringUtil::deserialize($objGroup->newp);
+					$arrBlogp = StringUtil::deserialize($objGroup->blogp);
 
-					if (is_array($arrNewp) && in_array('create', $arrNewp))
+					if (is_array($arrBlogp) && in_array('create', $arrBlogp))
 					{
-						$arrNews = StringUtil::deserialize($objGroup->news, true);
-						$arrNews[] = $insertId;
+						$arrBlogs = StringUtil::deserialize($objGroup->blogs, true);
+						$arrBlogs[] = $insertId;
 
-						$this->Database->prepare("UPDATE tl_user_group SET news=? WHERE id=?")
-									   ->execute(serialize($arrNews), $objGroup->id);
+						$this->Database->prepare("UPDATE tl_user_group SET blogs=? WHERE id=?")
+									   ->execute(serialize($arrBlogs), $objGroup->id);
 					}
 				}
 			}
@@ -430,35 +430,35 @@ class tl_blog_archive extends Backend
 			// Add the permissions on user level
 			if ($this->User->inherit != 'group')
 			{
-				$objUser = $this->Database->prepare("SELECT news, newp FROM tl_user WHERE id=?")
+				$objUser = $this->Database->prepare("SELECT blogs, blogp FROM tl_user WHERE id=?")
 										   ->limit(1)
 										   ->execute($this->User->id);
 
-				$arrNewp = StringUtil::deserialize($objUser->newp);
+				$arrBlogp = StringUtil::deserialize($objUser->blogp);
 
-				if (is_array($arrNewp) && in_array('create', $arrNewp))
+				if (is_array($arrBlogp) && in_array('create', $arrBlogp))
 				{
-					$arrNews = StringUtil::deserialize($objUser->news, true);
-					$arrNews[] = $insertId;
+					$arrBlogs = StringUtil::deserialize($objUser->blogs, true);
+					$arrBlogs[] = $insertId;
 
-					$this->Database->prepare("UPDATE tl_user SET news=? WHERE id=?")
-								   ->execute(serialize($arrNews), $this->User->id);
+					$this->Database->prepare("UPDATE tl_user SET blogs=? WHERE id=?")
+								   ->execute(serialize($arrBlogs), $this->User->id);
 				}
 			}
 
 			// Add the new element to the user object
 			$root[] = $insertId;
-			$this->User->news = $root;
+			$this->User->blog = $root;
 		}
 	}
 
 	/**
-	 * Check for modified news feeds and update the XML files if necessary
+	 * Check for modified blog feeds and update the XML files if necessary
 	 */
 	public function generateFeed()
 	{
 		$objSession = System::getContainer()->get('session');
-		$session = $objSession->get('news_feed_updater');
+		$session = $objSession->get('blog_feed_updater');
 
 		if (empty($session) || !is_array($session))
 		{
@@ -473,11 +473,11 @@ class tl_blog_archive extends Backend
 			$request->attributes->set('_scope', 'frontend');
 		}
 
-		$this->import(News::class, 'News');
+		$this->import(Blog::class, 'Blog');
 
 		foreach ($session as $id)
 		{
-			$this->News->generateFeedsByArchive($id);
+			$this->Blog->generateFeedsByArchive($id);
 		}
 
 		if ($request)
@@ -485,13 +485,13 @@ class tl_blog_archive extends Backend
 			$request->attributes->set('_scope', $origScope);
 		}
 
-		$objSession->set('news_feed_updater', null);
+		$objSession->set('blog_feed_updater', null);
 	}
 
 	/**
-	 * Schedule a news feed update
+	 * Schedule a blog feed update
 	 *
-	 * This method is triggered when a single news archive or multiple news
+	 * This method is triggered when a single blog archive or multiple blog
 	 * archives are modified (edit/editAll).
 	 *
 	 * @param DataContainer $dc
@@ -507,9 +507,9 @@ class tl_blog_archive extends Backend
 		$objSession = System::getContainer()->get('session');
 
 		// Store the ID in the session
-		$session = $objSession->get('news_feed_updater');
+		$session = $objSession->get('blog_feed_updater');
 		$session[] = $dc->id;
-		$objSession->set('news_feed_updater', array_unique($session));
+		$objSession->set('blog_feed_updater', array_unique($session));
 	}
 
 	/**
@@ -525,7 +525,7 @@ class tl_blog_archive extends Backend
 	 */
 	public function manageFeeds($href, $label, $title, $class, $attributes)
 	{
-		return ($this->User->isAdmin || !empty($this->User->newsfeeds) || !empty($this->User->newsfeedp)) ? '<a href="' . $this->addToUrl($href) . '" class="' . $class . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . $label . '</a> ' : '';
+		return ($this->User->isAdmin || !empty($this->User->blogfeeds) || !empty($this->User->blogfeedp)) ? '<a href="' . $this->addToUrl($href) . '" class="' . $class . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . $label . '</a> ' : '';
 	}
 
 	/**
@@ -559,7 +559,7 @@ class tl_blog_archive extends Backend
 	 */
 	public function copyArchive($row, $href, $label, $title, $icon, $attributes)
 	{
-		return System::getContainer()->get('security.helper')->isGranted(ContaoNewsPermissions::USER_CAN_CREATE_ARCHIVES) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
+		return System::getContainer()->get('security.helper')->isGranted(BlogPermissions::USER_CAN_CREATE_ARCHIVES) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
 	}
 
 	/**
@@ -576,7 +576,7 @@ class tl_blog_archive extends Backend
 	 */
 	public function deleteArchive($row, $href, $label, $title, $icon, $attributes)
 	{
-		return System::getContainer()->get('security.helper')->isGranted(ContaoNewsPermissions::USER_CAN_DELETE_ARCHIVES) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
+		return System::getContainer()->get('security.helper')->isGranted(BlogPermissions::USER_CAN_DELETE_ARCHIVES) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
 	}
 
 	/**

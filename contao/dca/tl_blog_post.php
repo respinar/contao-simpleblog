@@ -12,12 +12,12 @@ use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Security\ContaoCorePermissions;
+use Respinar\SimpleBlogBundle\Security\SimpleBlogPermissions;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\Input;
 use Contao\LayoutModel;
-use Contao\News;
+use Respinar\SimpleBlogBundle\Blog;
 use Contao\PageModel;
 use Contao\System;
 use Respinar\SimpleBlogBundle\Model\BlogArchiveModel;
@@ -143,11 +143,8 @@ $GLOBALS['TL_DCA']['tl_blog_post'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'__selector__'                => array('source', 'addImage', 'addEnclosure', 'overwriteMeta'),
-		'default'                     => '{title_legend},headline,featured,alias,author;{date_legend},date,time;{source_legend:hide},source;{meta_legend},pageTitle,robots,description,serpPreview;{teaser_legend},subheadline,teaser;{image_legend},addImage;{enclosure_legend:hide},addEnclosure;{expert_legend:hide},cssClass,noComments;{publish_legend},published,start,stop',
-		'internal'                    => '{title_legend},headline,featured,alias,author;{date_legend},date,time;{source_legend},source,jumpTo;{teaser_legend},subheadline,teaser;{image_legend},addImage;{enclosure_legend:hide},addEnclosure;{expert_legend:hide},cssClass,noComments;{publish_legend},published,start,stop',
-		'article'                     => '{title_legend},headline,featured,alias,author;{date_legend},date,time;{source_legend},source,articleId;{teaser_legend},subheadline,teaser;{image_legend},addImage;{enclosure_legend:hide},addEnclosure;{expert_legend:hide},cssClass,noComments;{publish_legend},published,start,stop',
-		'external'                    => '{title_legend},headline,featured,alias,author;{date_legend},date,time;{source_legend},source,url,target;{teaser_legend},subheadline,teaser;{image_legend},addImage;{enclosure_legend:hide},addEnclosure;{expert_legend:hide},cssClass,noComments;{publish_legend},published,start,stop'
+		'__selector__'                => array('addImage', 'addEnclosure', 'overwriteMeta'),
+		'default'                     => '{title_legend},headline,featured,alias,author;{date_legend},date,time;{meta_legend},pageTitle,robots,description,serpPreview;{teaser_legend},subheadline,teaser;{image_legend},addImage;{enclosure_legend:hide},addEnclosure;{expert_legend:hide},cssClass,noComments;{publish_legend},published,start,stop',
 	),
 
 	// Subpalettes
@@ -500,9 +497,9 @@ $GLOBALS['TL_DCA']['tl_blog_post'] = array
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property News $News
+ * @property Blog $Blog
  */
-class tl_blog extends Backend
+class tl_blog_post extends Backend
 {
 	/**
 	 * Import the back end user object
@@ -535,13 +532,13 @@ class tl_blog extends Backend
 		}
 
 		// Set the root IDs
-		if (empty($this->User->news) || !is_array($this->User->news))
+		if (empty($this->User->blogs) || !is_array($this->User->blogs))
 		{
 			$root = array(0);
 		}
 		else
 		{
-			$root = $this->User->news;
+			$root = $this->User->blogs;
 		}
 
 		$id = strlen(Input::get('id')) ? Input::get('id') : CURRENT_ID;
@@ -554,14 +551,14 @@ class tl_blog extends Backend
 				// Check CURRENT_ID here (see #247)
 				if (!in_array(CURRENT_ID, $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to access news archive ID ' . $id . '.');
+					throw new AccessDeniedException('Not enough permissions to access blog archive ID ' . $id . '.');
 				}
 				break;
 
 			case 'create':
 				if (!Input::get('pid') || !in_array(Input::get('pid'), $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to create news items in news archive ID ' . Input::get('pid') . '.');
+					throw new AccessDeniedException('Not enough permissions to create blog items in blog archive ID ' . Input::get('pid') . '.');
 				}
 				break;
 
@@ -575,7 +572,7 @@ class tl_blog extends Backend
 
 					if ($objArchive->numRows < 1)
 					{
-						throw new AccessDeniedException('Invalid news item ID ' . Input::get('pid') . '.');
+						throw new AccessDeniedException('Invalid blog item ID ' . Input::get('pid') . '.');
 					}
 
 					$pid = $objArchive->pid;
@@ -587,7 +584,7 @@ class tl_blog extends Backend
 
 				if (!in_array($pid, $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' news item ID ' . $id . ' to news archive ID ' . $pid . '.');
+					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' blog item ID ' . $id . ' to blog archive ID ' . $pid . '.');
 				}
 				// no break
 
@@ -601,12 +598,12 @@ class tl_blog extends Backend
 
 				if ($objArchive->numRows < 1)
 				{
-					throw new AccessDeniedException('Invalid news item ID ' . $id . '.');
+					throw new AccessDeniedException('Invalid blog item ID ' . $id . '.');
 				}
 
 				if (!in_array($objArchive->pid, $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' news item ID ' . $id . ' of news archive ID ' . $objArchive->pid . '.');
+					throw new AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' blog item ID ' . $id . ' of blog archive ID ' . $objArchive->pid . '.');
 				}
 				break;
 
@@ -617,7 +614,7 @@ class tl_blog extends Backend
 			case 'copyAll':
 				if (!in_array($id, $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to access news archive ID ' . $id . '.');
+					throw new AccessDeniedException('Not enough permissions to access blog archive ID ' . $id . '.');
 				}
 
 				$objArchive = $this->Database->prepare("SELECT id FROM tl_blog WHERE pid=?")
@@ -638,14 +635,14 @@ class tl_blog extends Backend
 
 				if (!in_array($id, $root))
 				{
-					throw new AccessDeniedException('Not enough permissions to access news archive ID ' . $id . '.');
+					throw new AccessDeniedException('Not enough permissions to access blog archive ID ' . $id . '.');
 				}
 				break;
 		}
 	}
 
 	/**
-	 * Auto-generate the news alias if it has not been set yet
+	 * Auto-generate the blog alias if it has not been set yet
 	 *
 	 * @param mixed         $varValue
 	 * @param DataContainer $dc
@@ -711,7 +708,7 @@ class tl_blog extends Backend
 	 */
 	public function getSerpUrl(BlogPostModel $model)
 	{
-		//return Blog::generateNewsUrl($model, false, true);
+		return Blog::generateBlogUrl($model, false, true);
 	}
 
 	/**
@@ -832,24 +829,6 @@ class tl_blog extends Backend
 		$security = System::getContainer()->get('security.helper');
 		$arrOptions = array('default');
 
-		// Add the "internal" option
-		if ($security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_blog::jumpTo'))
-		{
-			$arrOptions[] = 'internal';
-		}
-
-		// Add the "article" option
-		if ($security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_blog::articleId'))
-		{
-			$arrOptions[] = 'article';
-		}
-
-		// Add the "external" option
-		if ($security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_blog::url'))
-		{
-			$arrOptions[] = 'external';
-		}
-
 		// Add the option currently set
 		if ($dc->activeRecord && $dc->activeRecord->source)
 		{
@@ -880,12 +859,12 @@ class tl_blog extends Backend
 	}
 
 	/**
-	 * Check for modified news feeds and update the XML files if necessary
+	 * Check for modified blog feeds and update the XML files if necessary
 	 */
 	public function generateFeed()
 	{
 		$objSession = System::getContainer()->get('session');
-		$session = $objSession->get('news_feed_updater');
+		$session = $objSession->get('blog_feed_updater');
 
 		if (empty($session) || !is_array($session))
 		{
@@ -900,11 +879,11 @@ class tl_blog extends Backend
 			$request->attributes->set('_scope', 'frontend');
 		}
 
-		$this->import(News::class, 'News');
+		$this->import(Blog::class, 'Blog');
 
 		foreach ($session as $id)
 		{
-			$this->News->generateFeedsByArchive($id);
+			$this->Blog->generateFeedsByArchive($id);
 		}
 
 		if ($request)
@@ -912,13 +891,13 @@ class tl_blog extends Backend
 			$request->attributes->set('_scope', $origScope);
 		}
 
-		$objSession->set('news_feed_updater', null);
+		$objSession->set('blog_feed_updater', null);
 	}
 
 	/**
-	 * Schedule a news feed update
+	 * Schedule a blog feed update
 	 *
-	 * This method is triggered when a single news item or multiple news
+	 * This method is triggered when a single blog item or multiple blogs
 	 * items are modified (edit/editAll), moved (cut/cutAll) or deleted
 	 * (delete/deleteAll). Since duplicated items are unpublished by default,
 	 * it is not necessary to schedule updates on copyAll as well.
@@ -936,9 +915,9 @@ class tl_blog extends Backend
 		$objSession = System::getContainer()->get('session');
 
 		// Store the ID in the session
-		$session = $objSession->get('news_feed_updater');
+		$session = $objSession->get('blog_feed_updater');
 		$session[] = $dc->activeRecord->pid;
-		$objSession->set('news_feed_updater', array_unique($session));
+		$objSession->set('blog_feed_updater', array_unique($session));
 	}
 
 	/**
