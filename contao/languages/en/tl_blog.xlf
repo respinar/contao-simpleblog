@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.1">
+  <file datatype="php" original="vendor/respinar/contao-simpleblog/contao/languages/en/tl_blog.php" source-language="en">
+    <body>
+      <trans-unit id="tl_blog.first_legend">
+        <source>Basis Einstellungen</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.second_legend">
+        <source>Erweiterte Einstellungen</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.new.0">
+        <source>Neu</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.new.1">
+        <source>Ein neues Element anlegen</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.edit">
+        <source>Datensatz mit ID: %s bearbeiten</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.copy">
+        <source>Datensatz mit ID: %s kopieren</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.delete">
+        <source>Datensatz mit ID: %s löschen</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.show">
+        <source>Datensatz mit ID: %s ansehen</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.title.0">
+        <source>Titel</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.title.1">
+        <source>Geben Sie den Titel ein</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.selectField.0">
+        <source>Select Feld</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.selectField.1">
+        <source>Wählen Sie aus.</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.checkboxField.0">
+        <source>Chosen Feld</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.checkboxField.1">
+        <source>Wählen Sie aus.</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.multitextField.0">
+        <source>Multitext Feld</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.multitextField.1">
+        <source>Geben Sie die Werte ein</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.addSubpalette.0">
+        <source>Erweiterte Einstellungen aktivieren</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.addSubpalette.1">
+        <source>Hier können Sie die erweiterten Einstellungen aktivieren.</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.textareaField.0">
+        <source>Textarea</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.textareaField.1">
+        <source>Geben Sie einen Text ein</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.firstoption">
+        <source>Erste Option</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.secondoption">
+        <source>Zweite Option</source>
+      </trans-unit>
+      <trans-unit id="tl_blog.customButton">
+        <source>Custom Routine starten</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
